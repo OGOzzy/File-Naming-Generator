@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Naming Convention Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4285f4;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(66, 133, 244, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #4285f4;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .filename-display {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #4285f4;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            word-break: break-all;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .copy-btn {
+            background: #34a853;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #2d8f47;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .col-half {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>File Naming Generator</h1>
+            <p>Generate standardized filenames for your digital assets</p>
+        </div>
+
+        <div class="form-container">
+            <form id="filenameForm">
+
+
+                <div class="row">
+                    <div class="col-half">
+                        <div class="form-group">
+                            <label for="clientCode">Client Code</label>
+                            <input type="text" id="clientCode" name="clientCode" required placeholder="e.g., SCL, MAR, NEW">
+                        </div>
+                    </div>
+                    <div class="col-half">
+                        <div class="form-group">
+                            <label for="jobNumber">Job Tracking Number</label>
+                            <input type="text" id="jobNumber" name="jobNumber" required placeholder="e.g., 379, 1001">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="projectName">Project/Campaign Name</label>
+                    <input type="text" id="projectName" name="projectName" required placeholder="e.g., VoyagersSnacksPalletDisplay">
+                </div>
+
+                <div class="row">
+                    <div class="col-half">
+                        <div class="form-group">
+                            <label for="assetType">Asset Type</label>
+                            <select id="assetType" name="assetType" required>
+                                <option value="">Select Asset Type</option>
+                                <option value="GRAPHIC">GRAPHIC</option>
+                                <option value="PHOTO">PHOTO</option>
+                                <option value="VID">VID</option>
+                                <option value="AUDIO">AUDIO</option>
+                                <option value="DOC">DOC</option>
+                                <option value="OTHER">OTHER</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-half">
+                        <div class="form-group">
+                            <label for="version">Version</label>
+                            <input type="text" id="version" name="version" required placeholder="e.g., V01, V02, FINAL">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date (Export/shoot date for sorting)</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="descriptor">Descriptor</label>
+                    <input type="text" id="descriptor" name="descriptor" required placeholder="e.g., HeroShot01, Interview01, LogoBumper">
+                </div>
+
+                <div class="form-group">
+                    <label for="folderPath">Staging Folder Path (Optional)</label>
+                    <input type="text" id="folderPath" name="folderPath" placeholder="e.g., /projects/client/job123">
+                </div>
+
+                <button type="submit" class="btn" id="generateBtn">Generate Filename</button>
+            </form>
+
+            <div id="resultContainer" class="result-container">
+                <div class="result-title">Generated Filename:</div>
+                <div id="filenameDisplay" class="filename-display"></div>
+                <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Generating filename...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+
+        // File naming functions (adapted from your Google Apps Script)
+        function cleanFilename(text) {
+            if (!text) return '';
+            
+            text = text.toString();
+            text = text.replace(/[<>:"/\\|?*]/g, '');
+            text = text.replace(/\s+/g, '');
+            
+            return text;
+        }
+
+        function formatDate(dateStr) {
+            try {
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) {
+                    return dateStr;
+                }
+                
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                
+                return `${year}-${month}-${day}`;
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function buildFilename(client, jobNum, project, assetType, version, date, descriptor, extension = '') {
+            client = cleanFilename(client).toUpperCase();
+            jobNum = cleanFilename(jobNum);
+            project = cleanFilename(project);
+            assetType = cleanFilename(assetType).toUpperCase();
+            version = cleanFilename(version).toUpperCase();
+            date = formatDate(date);
+            descriptor = cleanFilename(descriptor);
+            
+            if (extension && !extension.startsWith('.')) {
+                extension = '.' + extension;
+            }
+            
+            return `${client}_${jobNum}_${project}_${assetType}_${version}_${date}_${descriptor}${extension}`;
+        }
+
+        // Form submission handler
+        document.getElementById('filenameForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultContainer').classList.remove('show');
+            
+            // Simulate processing time
+            setTimeout(() => {
+                // Generate filename
+                const filename = buildFilename(
+                    data.clientCode,
+                    data.jobNumber,
+                    data.projectName,
+                    data.assetType,
+                    data.version,
+                    data.date,
+                    data.descriptor
+                );
+                
+                // Display result
+                document.getElementById('filenameDisplay').textContent = filename;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resultContainer').classList.add('show');
+                
+                // Optional: Submit to Google Apps Script
+                submitToGoogleScript(data, filename);
+            }, 1000);
+        });
+
+        // Copy to clipboard function
+        function copyToClipboard() {
+            const filename = document.getElementById('filenameDisplay').textContent;
+            navigator.clipboard.writeText(filename).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = '#4285f4';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#34a853';
+                }, 2000);
+            });
+        }
+
+        // Submit to Google Apps Script (optional)
+        function submitToGoogleScript(data, filename) {
+            // You can implement this to also save to your Google Sheet
+            // For now, it just logs the data
+            console.log('Form data:', data);
+            console.log('Generated filename:', filename);
+            
+            // Uncomment and modify this section when you set up the Google Apps Script web app
+            /*
+            fetch('YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...data,
+                    generatedFilename: filename,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Success:', result);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+            */
+        }
+    </script>
+</body>
+</html>
